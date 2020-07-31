@@ -1,11 +1,11 @@
 /*
-* MFRC522.cpp - Library to use ARDUINO RFID MODULE KIT 13.56 MHZ WITH TAGS SPI W AND R BY COOQROBOT.
-* NOTE: Please also check the comments in MFRC522.h - they provide useful hints and background information.
+* NFC.cpp - Library to use ARDUINO RFID MODULE KIT 13.56 MHZ WITH TAGS SPI W AND R BY COOQROBOT.
+* NOTE: Please also check the comments in NFC.h - they provide useful hints and background information.
 * Released into the public domain.
 */
 
 #include <Arduino.h>
-#include "MFRC522.h"
+#include "NFC.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
 // Functions for setting up the Arduino
@@ -13,40 +13,40 @@
 /**
  * Constructor.
  */
-MFRC522::MFRC522(): MFRC522(SS, UINT8_MAX) { // SS is defined in pins_arduino.h, UINT8_MAX means there is no connection from Arduino to MFRC522's reset and power down input
+NFC::NFC(): NFC(SS, UINT8_MAX) { // SS is defined in pins_arduino.h, UINT8_MAX means there is no connection from Arduino to NFC's reset and power down input
 } // End constructor
 
 /**
  * Constructor.
  * Prepares the output pins.
  */
-MFRC522::MFRC522(	byte resetPowerDownPin	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
-				): MFRC522(SS, resetPowerDownPin) { // SS is defined in pins_arduino.h
+NFC::NFC(	byte resetPowerDownPin	///< Arduino pin connected to NFC's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in iniciar().
+				): NFC(SS, resetPowerDownPin) { // SS is defined in pins_arduino.h
 } // End constructor
 
 /**
  * Constructor.
  * Prepares the output pins.
  */
-MFRC522::MFRC522(	byte chipSelectPin,		///< Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
-					byte resetPowerDownPin	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
+NFC::NFC(	byte chipSelectPin,		///< Arduino pin connected to NFC's SPI slave select input (Pin 24, NSS, active low)
+					byte resetPowerDownPin	///< Arduino pin connected to NFC's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in iniciar().
 				) {
 	_chipSelectPin = chipSelectPin;
 	_resetPowerDownPin = resetPowerDownPin;
 } // End constructor
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Basic interface functions for communicating with the MFRC522
+// Basic interface functions for communicating with the NFC
 /////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Writes a byte to the specified register in the MFRC522 chip.
+ * Writes a byte to the specified register in the NFC chip.
  * The interface is described in the datasheet section 8.1.2.
  */
-void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to. One of the PCD_Register enums.
+void NFC::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to. One of the PCD_Register enums.
 									byte value			///< The value to write.
 								) {
-	SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
+	SPI.beginTransaction(SPISettings(NFC_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
 	digitalWrite(_chipSelectPin, LOW);		// Select slave
 	SPI.transfer(reg);						// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
 	SPI.transfer(value);
@@ -55,14 +55,14 @@ void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to
 } // End PCD_WriteRegister()
 
 /**
- * Writes a number of bytes to the specified register in the MFRC522 chip.
+ * Writes a number of bytes to the specified register in the NFC chip.
  * The interface is described in the datasheet section 8.1.2.
  */
-void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to. One of the PCD_Register enums.
+void NFC::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to. One of the PCD_Register enums.
 									byte count,			///< The number of bytes to write to the register
 									byte *values		///< The values to write. Byte array.
 								) {
-	SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
+	SPI.beginTransaction(SPISettings(NFC_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
 	digitalWrite(_chipSelectPin, LOW);		// Select slave
 	SPI.transfer(reg);						// MSB == 0 is for writing. LSB is not used in address. Datasheet section 8.1.2.3.
 	for (byte index = 0; index < count; index++) {
@@ -73,13 +73,13 @@ void MFRC522::PCD_WriteRegister(	PCD_Register reg,	///< The register to write to
 } // End PCD_WriteRegister()
 
 /**
- * Reads a byte from the specified register in the MFRC522 chip.
+ * Reads a byte from the specified register in the NFC chip.
  * The interface is described in the datasheet section 8.1.2.
  */
-byte MFRC522::PCD_ReadRegister(	PCD_Register reg	///< The register to read from. One of the PCD_Register enums.
+byte NFC::PCD_ReadRegister(	PCD_Register reg	///< The register to read from. One of the PCD_Register enums.
 								) {
 	byte value;
-	SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
+	SPI.beginTransaction(SPISettings(NFC_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
 	digitalWrite(_chipSelectPin, LOW);			// Select slave
 	SPI.transfer(0x80 | reg);					// MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
 	value = SPI.transfer(0);					// Read the value back. Send 0 to stop reading.
@@ -89,10 +89,10 @@ byte MFRC522::PCD_ReadRegister(	PCD_Register reg	///< The register to read from.
 } // End PCD_ReadRegister()
 
 /**
- * Reads a number of bytes from the specified register in the MFRC522 chip.
+ * Reads a number of bytes from the specified register in the NFC chip.
  * The interface is described in the datasheet section 8.1.2.
  */
-void MFRC522::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from. One of the PCD_Register enums.
+void NFC::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from. One of the PCD_Register enums.
 								byte count,			///< The number of bytes to read
 								byte *values,		///< Byte array to store the values in.
 								byte rxAlign		///< Only bit positions rxAlign..7 in values[0] are updated.
@@ -103,10 +103,10 @@ void MFRC522::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from
 	//Serial.print(F("Reading ")); 	Serial.print(count); Serial.println(F(" bytes from register."));
 	byte address = 0x80 | reg;				// MSB == 1 is for reading. LSB is not used in address. Datasheet section 8.1.2.3.
 	byte index = 0;							// Index in values array.
-	SPI.beginTransaction(SPISettings(MFRC522_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
+	SPI.beginTransaction(SPISettings(NFC_SPICLOCK, MSBFIRST, SPI_MODE0));	// Set the settings to work with SPI bus
 	digitalWrite(_chipSelectPin, LOW);		// Select slave
 	count--;								// One read is performed outside of the loop
-	SPI.transfer(address);					// Tell MFRC522 which address we want to read
+	SPI.transfer(address);					// Tell NFC which address we want to read
 	if (rxAlign) {		// Only update bit positions rxAlign..7 in values[0]
 		// Create bit mask for bit positions rxAlign..7
 		byte mask = (0xFF << rxAlign) & 0xFF;
@@ -128,7 +128,7 @@ void MFRC522::PCD_ReadRegister(	PCD_Register reg,	///< The register to read from
 /**
  * Sets the bits given in mask in register reg.
  */
-void MFRC522::PCD_SetRegisterBitMask(	PCD_Register reg,	///< The register to update. One of the PCD_Register enums.
+void NFC::PCD_SetRegisterBitMask(	PCD_Register reg,	///< The register to update. One of the PCD_Register enums.
 										byte mask			///< The bits to set.
 									) { 
 	byte tmp;
@@ -139,7 +139,7 @@ void MFRC522::PCD_SetRegisterBitMask(	PCD_Register reg,	///< The register to upd
 /**
  * Clears the bits given in mask from register reg.
  */
-void MFRC522::PCD_ClearRegisterBitMask(	PCD_Register reg,	///< The register to update. One of the PCD_Register enums.
+void NFC::PCD_ClearRegisterBitMask(	PCD_Register reg,	///< The register to update. One of the PCD_Register enums.
 										byte mask			///< The bits to clear.
 									  ) {
 	byte tmp;
@@ -149,11 +149,11 @@ void MFRC522::PCD_ClearRegisterBitMask(	PCD_Register reg,	///< The register to u
 
 
 /**
- * Use the CRC coprocessor in the MFRC522 to calculate a CRC_A.
+ * Use the CRC coprocessor in the NFC to calculate a CRC_A.
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PCD_CalculateCRC(	byte *data,		///< In: Pointer to the data to transfer to the FIFO for CRC calculation.
+NFC::StatusCode NFC::PCD_CalculateCRC(	byte *data,		///< In: Pointer to the data to transfer to the FIFO for CRC calculation.
 												byte length,	///< In: The number of bytes to transfer.
 												byte *result	///< Out: Pointer to result buffer. Result is written to result[0..1], low byte first.
 					 ) {
@@ -178,19 +178,19 @@ MFRC522::StatusCode MFRC522::PCD_CalculateCRC(	byte *data,		///< In: Pointer to 
 			return STATUS_OK;
 		}
 	}
-	// 89ms passed and nothing happend. Communication with the MFRC522 might be down.
+	// 89ms passed and nothing happend. Communication with the NFC might be down.
 	return STATUS_TIMEOUT;
 } // End PCD_CalculateCRC()
 
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Functions for manipulating the MFRC522
+// Functions for manipulating the NFC
 /////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Initializes the MFRC522 chip.
+ * Initializes the NFC chip.
  */
-void MFRC522::PCD_Init() {
+void NFC::iniciar() {
 	bool hardReset = false;
 
 	// Set the chipSelectPin as digital output, do not select the slave yet
@@ -199,10 +199,10 @@ void MFRC522::PCD_Init() {
 	
 	// If a valid pin number has been set, pull device out of power down / reset state.
 	if (_resetPowerDownPin != UNUSED_PIN) {
-		// First set the resetPowerDownPin as digital input, to check the MFRC522 power down mode.
+		// First set the resetPowerDownPin as digital input, to check the NFC power down mode.
 		pinMode(_resetPowerDownPin, INPUT);
 	
-		if (digitalRead(_resetPowerDownPin) == LOW) {	// The MFRC522 chip is in power down mode.
+		if (digitalRead(_resetPowerDownPin) == LOW) {	// The NFC chip is in power down mode.
 			pinMode(_resetPowerDownPin, OUTPUT);		// Now set the resetPowerDownPin as digital output.
 			digitalWrite(_resetPowerDownPin, LOW);		// Make sure we have a clean LOW state.
 			delayMicroseconds(2);				// 8.8.1 Reset timing requirements says about 100ns. Let us be generous: 2μsl
@@ -234,35 +234,35 @@ void MFRC522::PCD_Init() {
 	PCD_WriteRegister(TxASKReg, 0x40);		// Default 0x00. Force a 100 % ASK modulation independent of the ModGsPReg register setting
 	PCD_WriteRegister(ModeReg, 0x3D);		// Default 0x3F. Set the preset value for the CRC coprocessor for the CalcCRC command to 0x6363 (ISO 14443-3 part 6.2.4)
 	PCD_AntennaOn();						// Enable the antenna driver pins TX1 and TX2 (they were disabled by the reset)
-} // End PCD_Init()
+} // End iniciar()
 
 /**
- * Initializes the MFRC522 chip.
+ * Initializes the NFC chip.
  */
-void MFRC522::PCD_Init(	byte resetPowerDownPin	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
+void NFC::iniciar(	byte resetPowerDownPin	///< Arduino pin connected to NFC's reset and power down input (Pin 6, NRSTPD, active low)
 					) {
-	PCD_Init(SS, resetPowerDownPin); // SS is defined in pins_arduino.h
-} // End PCD_Init()
+	iniciar(SS, resetPowerDownPin); // SS is defined in pins_arduino.h
+} // End iniciar()
 
 /**
- * Initializes the MFRC522 chip.
+ * Initializes the NFC chip.
  */
-void MFRC522::PCD_Init(	byte chipSelectPin,		///< Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
-						byte resetPowerDownPin	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
+void NFC::iniciar(	byte chipSelectPin,		///< Arduino pin connected to NFC's SPI slave select input (Pin 24, NSS, active low)
+						byte resetPowerDownPin	///< Arduino pin connected to NFC's reset and power down input (Pin 6, NRSTPD, active low)
 					) {
 	_chipSelectPin = chipSelectPin;
 	_resetPowerDownPin = resetPowerDownPin; 
 	// Set the chipSelectPin as digital output, do not select the slave yet
-	PCD_Init();
-} // End PCD_Init()
+	iniciar();
+} // End iniciar()
 
 /**
- * Performs a soft reset on the MFRC522 chip and waits for it to be ready again.
+ * Performs a soft reset on the NFC chip and waits for it to be ready again.
  */
-void MFRC522::PCD_Reset() {
+void NFC::PCD_Reset() {
 	PCD_WriteRegister(CommandReg, PCD_SoftReset);	// Issue the SoftReset command.
 	// The datasheet does not mention how long the SoftRest command takes to complete.
-	// But the MFRC522 might have been in soft power-down mode (triggered by bit 4 of CommandReg) 
+	// But the NFC might have been in soft power-down mode (triggered by bit 4 of CommandReg) 
 	// Section 8.8.2 in the datasheet says the oscillator start-up time is the start up time of the crystal + 37,74μs. Let us be generous: 50ms.
 	uint8_t count = 0;
 	do {
@@ -275,7 +275,7 @@ void MFRC522::PCD_Reset() {
  * Turns the antenna on by enabling pins TX1 and TX2.
  * After a reset these pins are disabled.
  */
-void MFRC522::PCD_AntennaOn() {
+void NFC::PCD_AntennaOn() {
 	byte value = PCD_ReadRegister(TxControlReg);
 	if ((value & 0x03) != 0x03) {
 		PCD_WriteRegister(TxControlReg, value | 0x03);
@@ -285,27 +285,27 @@ void MFRC522::PCD_AntennaOn() {
 /**
  * Turns the antenna off by disabling pins TX1 and TX2.
  */
-void MFRC522::PCD_AntennaOff() {
+void NFC::PCD_AntennaOff() {
 	PCD_ClearRegisterBitMask(TxControlReg, 0x03);
 } // End PCD_AntennaOff()
 
 /**
- * Get the current MFRC522 Receiver Gain (RxGain[2:0]) value.
- * See 9.3.3.6 / table 98 in http://www.nxp.com/documents/data_sheet/MFRC522.pdf
+ * Get the current NFC Receiver Gain (RxGain[2:0]) value.
+ * See 9.3.3.6 / table 98 in http://www.nxp.com/documents/data_sheet/NFC.pdf
  * NOTE: Return value scrubbed with (0x07<<4)=01110000b as RCFfgReg may use reserved bits.
  * 
  * @return Value of the RxGain, scrubbed to the 3 bits used.
  */
-byte MFRC522::PCD_GetAntennaGain() {
+byte NFC::PCD_GetAntennaGain() {
 	return PCD_ReadRegister(RFCfgReg) & (0x07<<4);
 } // End PCD_GetAntennaGain()
 
 /**
- * Set the MFRC522 Receiver Gain (RxGain) to value specified by given mask.
- * See 9.3.3.6 / table 98 in http://www.nxp.com/documents/data_sheet/MFRC522.pdf
+ * Set the NFC Receiver Gain (RxGain) to value specified by given mask.
+ * See 9.3.3.6 / table 98 in http://www.nxp.com/documents/data_sheet/NFC.pdf
  * NOTE: Given mask is scrubbed with (0x07<<4)=01110000b as RCFfgReg may use reserved bits.
  */
-void MFRC522::PCD_SetAntennaGain(byte mask) {
+void NFC::PCD_SetAntennaGain(byte mask) {
 	if (PCD_GetAntennaGain() != mask) {						// only bother if there is a change
 		PCD_ClearRegisterBitMask(RFCfgReg, (0x07<<4));		// clear needed to allow 000 pattern
 		PCD_SetRegisterBitMask(RFCfgReg, mask & (0x07<<4));	// only set RxGain[2:0] bits
@@ -313,12 +313,12 @@ void MFRC522::PCD_SetAntennaGain(byte mask) {
 } // End PCD_SetAntennaGain()
 
 /**
- * Performs a self-test of the MFRC522
- * See 16.1.1 in http://www.nxp.com/documents/data_sheet/MFRC522.pdf
+ * Performs a self-test of the NFC
+ * See 16.1.1 in http://www.nxp.com/documents/data_sheet/NFC.pdf
  * 
  * @return Whether or not the test passed. Or false if no firmware reference is available.
  */
-bool MFRC522::PCD_PerformSelfTest() {
+bool NFC::PCD_PerformSelfTest() {
 	// This follows directly the steps outlined in 16.1.1
 	// 1. Perform a soft reset.
 	PCD_Reset();
@@ -373,13 +373,13 @@ bool MFRC522::PCD_PerformSelfTest() {
 			reference = FM17522_firmware_reference;
 			break;
 		case 0x90:	// Version 0.0
-			reference = MFRC522_firmware_referenceV0_0;
+			reference = NFC_firmware_referenceV0_0;
 			break;
 		case 0x91:	// Version 1.0
-			reference = MFRC522_firmware_referenceV1_0;
+			reference = NFC_firmware_referenceV1_0;
 			break;
 		case 0x92:	// Version 2.0
-			reference = MFRC522_firmware_referenceV2_0;
+			reference = NFC_firmware_referenceV2_0;
 			break;
 		default:	// Unknown version
 			return false; // abort test
@@ -404,13 +404,13 @@ bool MFRC522::PCD_PerformSelfTest() {
 //Calling any other function that uses CommandReg will disable soft power down mode !!!
 //For more details about power control, refer to the datasheet - page 33 (8.6)
 
-void MFRC522::PCD_SoftPowerDown(){//Note : Only soft power down mode is available throught software
+void NFC::PCD_SoftPowerDown(){//Note : Only soft power down mode is available throught software
 	byte val = PCD_ReadRegister(CommandReg); // Read state of the command register 
 	val |= (1<<4);// set PowerDown bit ( bit 4 ) to 1 
 	PCD_WriteRegister(CommandReg, val);//write new value to the command register
 }
 
-void MFRC522::PCD_SoftPowerUp(){
+void NFC::PCD_SoftPowerUp(){
 	byte val = PCD_ReadRegister(CommandReg); // Read state of the command register 
 	val &= ~(1<<4);// set PowerDown bit ( bit 4 ) to 0 
 	PCD_WriteRegister(CommandReg, val);//write new value to the command register
@@ -435,7 +435,7 @@ void MFRC522::PCD_SoftPowerUp(){
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PCD_TransceiveData(	byte *sendData,		///< Pointer to the data to transfer to the FIFO.
+NFC::StatusCode NFC::PCD_TransceiveData(	byte *sendData,		///< Pointer to the data to transfer to the FIFO.
 													byte sendLen,		///< Number of bytes to transfer to the FIFO.
 													byte *backData,		///< nullptr or pointer to buffer if data should be read back after executing the command.
 													byte *backLen,		///< In: Max number of bytes to write to *backData. Out: The number of bytes returned.
@@ -448,12 +448,12 @@ MFRC522::StatusCode MFRC522::PCD_TransceiveData(	byte *sendData,		///< Pointer t
 } // End PCD_TransceiveData()
 
 /**
- * Transfers data to the MFRC522 FIFO, executes a command, waits for completion and transfers data back from the FIFO.
+ * Transfers data to the NFC FIFO, executes a command, waits for completion and transfers data back from the FIFO.
  * CRC validation can only be done if backData and backLen are specified.
  *
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The command to execute. One of the PCD_Command enums.
+NFC::StatusCode NFC::PCD_CommunicateWithPICC(	byte command,		///< The command to execute. One of the PCD_Command enums.
 														byte waitIRq,		///< The bits in the ComIrqReg register that signals successful completion of the command.
 														byte *sendData,		///< Pointer to the data to transfer to the FIFO.
 														byte sendLen,		///< Number of bytes to transfer to the FIFO.
@@ -478,7 +478,7 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The co
 	}
 	
 	// Wait for the command to complete.
-	// In PCD_Init() we set the TAuto flag in TModeReg. This means the timer automatically starts when the PCD stops transmitting.
+	// In iniciar() we set the TAuto flag in TModeReg. This means the timer automatically starts when the PCD stops transmitting.
 	// Each iteration of the do-while-loop takes 17.86μs.
 	// TODO check/modify for other architectures than Arduino Uno 16bit
 	uint16_t i;
@@ -491,7 +491,7 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The co
 			return STATUS_TIMEOUT;
 		}
 	}
-	// 35.7ms and nothing happend. Communication with the MFRC522 might be down.
+	// 35.7ms and nothing happend. Communication with the NFC might be down.
 	if (i == 0) {
 		return STATUS_TIMEOUT;
 	}
@@ -504,7 +504,7 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The co
   
 	byte _validBits = 0;
 	
-	// If the caller wants data back, get it from the MFRC522.
+	// If the caller wants data back, get it from the NFC.
 	if (backData && backLen) {
 		byte n = PCD_ReadRegister(FIFOLevelReg);	// Number of bytes in the FIFO
 		if (n > *backLen) {
@@ -535,7 +535,7 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The co
 		}
 		// Verify CRC_A - do our own calculation and store the control in controlBuffer.
 		byte controlBuffer[2];
-		MFRC522::StatusCode status = PCD_CalculateCRC(&backData[0], *backLen - 2, &controlBuffer[0]);
+		NFC::StatusCode status = PCD_CalculateCRC(&backData[0], *backLen - 2, &controlBuffer[0]);
 		if (status != STATUS_OK) {
 			return status;
 		}
@@ -553,7 +553,7 @@ MFRC522::StatusCode MFRC522::PCD_CommunicateWithPICC(	byte command,		///< The co
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PICC_RequestA(	byte *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
+NFC::StatusCode NFC::PICC_RequestA(	byte *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
 											byte *bufferSize	///< Buffer size, at least two bytes. Also number of bytes returned if STATUS_OK.
 										) {
 	return PICC_REQA_or_WUPA(PICC_CMD_REQA, bufferATQA, bufferSize);
@@ -565,7 +565,7 @@ MFRC522::StatusCode MFRC522::PICC_RequestA(	byte *bufferATQA,	///< The buffer to
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PICC_WakeupA(	byte *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
+NFC::StatusCode NFC::PICC_WakeupA(	byte *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
 											byte *bufferSize	///< Buffer size, at least two bytes. Also number of bytes returned if STATUS_OK.
 										) {
 	return PICC_REQA_or_WUPA(PICC_CMD_WUPA, bufferATQA, bufferSize);
@@ -577,12 +577,12 @@ MFRC522::StatusCode MFRC522::PICC_WakeupA(	byte *bufferATQA,	///< The buffer to 
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */ 
-MFRC522::StatusCode MFRC522::PICC_REQA_or_WUPA(	byte command, 		///< The command to send - PICC_CMD_REQA or PICC_CMD_WUPA
+NFC::StatusCode NFC::PICC_REQA_or_WUPA(	byte command, 		///< The command to send - PICC_CMD_REQA or PICC_CMD_WUPA
 												byte *bufferATQA,	///< The buffer to store the ATQA (Answer to request) in
 												byte *bufferSize	///< Buffer size, at least two bytes. Also number of bytes returned if STATUS_OK.
 											) {
 	byte validBits;
-	MFRC522::StatusCode status;
+	NFC::StatusCode status;
 	
 	if (bufferATQA == nullptr || *bufferSize < 2) {	// The ATQA response is 2 bytes long.
 		return STATUS_NO_ROOM;
@@ -616,14 +616,14 @@ MFRC522::StatusCode MFRC522::PICC_REQA_or_WUPA(	byte command, 		///< The command
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct. Normally output, but can also be used to supply a known UID.
+NFC::StatusCode NFC::PICC_Select(	Uid *uid,			///< Pointer to Uid struct. Normally output, but can also be used to supply a known UID.
 											byte validBits		///< The number of known UID bits supplied in *uid. Normally 0. If set you must also supply uid->size.
 										 ) {
 	bool uidComplete;
 	bool selectDone;
 	bool useCascadeTag;
 	byte cascadeLevel = 1;
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	byte count;
 	byte checkBit;
 	byte index;
@@ -663,7 +663,7 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
 		return STATUS_INVALID;
 	}
 	
-	// Prepare MFRC522
+	// Prepare NFC
 	PCD_ClearRegisterBitMask(CollReg, 0x80);		// ValuesAfterColl=1 => Bits received after collision are cleared.
 	
 	// Repeat Cascade Level loop until we have a complete UID.
@@ -833,8 +833,8 @@ MFRC522::StatusCode MFRC522::PICC_Select(	Uid *uid,			///< Pointer to Uid struct
  *
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */ 
-MFRC522::StatusCode MFRC522::PICC_HaltA() {
-	MFRC522::StatusCode result;
+NFC::StatusCode NFC::PICC_HaltA() {
+	NFC::StatusCode result;
 	byte buffer[4];
 	
 	// Build command buffer
@@ -866,9 +866,9 @@ MFRC522::StatusCode MFRC522::PICC_HaltA() {
 /////////////////////////////////////////////////////////////////////////////////////
 
 /**
- * Executes the MFRC522 MFAuthent command.
+ * Executes the NFC MFAuthent command.
  * This command manages MIFARE authentication to enable a secure communication to any MIFARE Mini, MIFARE 1K and MIFARE 4K card.
- * The authentication is described in the MFRC522 datasheet section 10.3.1.9 and http://www.nxp.com/documents/data_sheet/MF1S503x.pdf section 10.1.
+ * The authentication is described in the NFC datasheet section 10.3.1.9 and http://www.nxp.com/documents/data_sheet/MF1S503x.pdf section 10.1.
  * For use with MIFARE Classic PICCs.
  * The PICC must be selected - ie in state ACTIVE(*) - before calling this function.
  * Remember to call PCD_StopCrypto1() after communicating with the authenticated PICC - otherwise no new communications can start.
@@ -877,7 +877,7 @@ MFRC522::StatusCode MFRC522::PICC_HaltA() {
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise. Probably STATUS_TIMEOUT if you supply the wrong key.
  */
-MFRC522::StatusCode MFRC522::PCD_Authenticate(byte command,		///< PICC_CMD_MF_AUTH_KEY_A or PICC_CMD_MF_AUTH_KEY_B
+NFC::StatusCode NFC::PCD_Authenticate(byte command,		///< PICC_CMD_MF_AUTH_KEY_A or PICC_CMD_MF_AUTH_KEY_B
 											byte blockAddr, 	///< The block number. See numbering in the comments in the .h file.
 											MIFARE_Key *key,	///< Pointer to the Crypteo1 key to use (6 bytes)
 											Uid *uid			///< Pointer to Uid struct. The first 4 bytes of the UID is used.
@@ -907,7 +907,7 @@ MFRC522::StatusCode MFRC522::PCD_Authenticate(byte command,		///< PICC_CMD_MF_AU
  * Used to exit the PCD from its authenticated state.
  * Remember to call this function after communicating with an authenticated PICC - otherwise no new communications can start.
  */
-void MFRC522::PCD_StopCrypto1() {
+void NFC::PCD_StopCrypto1() {
 	// Clear MFCrypto1On bit
 	PCD_ClearRegisterBitMask(Status2Reg, 0x08); // Status2Reg[7..0] bits are: TempSensClear I2CForceHS reserved reserved MFCrypto1On ModemState[2:0]
 } // End PCD_StopCrypto1()
@@ -928,11 +928,11 @@ void MFRC522::PCD_StopCrypto1() {
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Read(	byte blockAddr, 	///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The first page to return data from.
+NFC::StatusCode NFC::MIFARE_Read(	byte blockAddr, 	///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The first page to return data from.
 											byte *buffer,		///< The buffer to store the data in
 											byte *bufferSize	///< Buffer size, at least 18 bytes. Also number of bytes returned if STATUS_OK.
 										) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	
 	// Sanity check
 	if (buffer == nullptr || *bufferSize < 18) {
@@ -963,11 +963,11 @@ MFRC522::StatusCode MFRC522::MIFARE_Read(	byte blockAddr, 	///< MIFARE Classic: 
  * * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Write(	byte blockAddr, ///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The page (2-15) to write to.
+NFC::StatusCode NFC::MIFARE_Write(	byte blockAddr, ///< MIFARE Classic: The block (0-0xff) number. MIFARE Ultralight: The page (2-15) to write to.
 											byte *buffer,	///< The 16 bytes to write to the PICC
 											byte bufferSize	///< Buffer size, must be at least 16 bytes. Exactly 16 bytes are written.
 										) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	
 	// Sanity check
 	if (buffer == nullptr || bufferSize < 16) {
@@ -998,11 +998,11 @@ MFRC522::StatusCode MFRC522::MIFARE_Write(	byte blockAddr, ///< MIFARE Classic: 
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Ultralight_Write(	byte page, 		///< The page (2-15) to write to.
+NFC::StatusCode NFC::MIFARE_Ultralight_Write(	byte page, 		///< The page (2-15) to write to.
 														byte *buffer,	///< The 4 bytes to write to the PICC
 														byte bufferSize	///< Buffer size, must be at least 4 bytes. Exactly 4 bytes are written.
 													) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	
 	// Sanity check
 	if (buffer == nullptr || bufferSize < 4) {
@@ -1031,7 +1031,7 @@ MFRC522::StatusCode MFRC522::MIFARE_Ultralight_Write(	byte page, 		///< The page
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Decrement(	byte blockAddr, ///< The block (0-0xff) number.
+NFC::StatusCode NFC::MIFARE_Decrement(	byte blockAddr, ///< The block (0-0xff) number.
 												int32_t delta		///< This number is subtracted from the value of block blockAddr.
 											) {
 	return MIFARE_TwoStepHelper(PICC_CMD_MF_DECREMENT, blockAddr, delta);
@@ -1045,7 +1045,7 @@ MFRC522::StatusCode MFRC522::MIFARE_Decrement(	byte blockAddr, ///< The block (0
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Increment(	byte blockAddr, ///< The block (0-0xff) number.
+NFC::StatusCode NFC::MIFARE_Increment(	byte blockAddr, ///< The block (0-0xff) number.
 												int32_t delta		///< This number is added to the value of block blockAddr.
 											) {
 	return MIFARE_TwoStepHelper(PICC_CMD_MF_INCREMENT, blockAddr, delta);
@@ -1059,7 +1059,7 @@ MFRC522::StatusCode MFRC522::MIFARE_Increment(	byte blockAddr, ///< The block (0
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Restore(	byte blockAddr ///< The block (0-0xff) number.
+NFC::StatusCode NFC::MIFARE_Restore(	byte blockAddr ///< The block (0-0xff) number.
 											) {
 	// The datasheet describes Restore as a two step operation, but does not explain what data to transfer in step 2.
 	// Doing only a single step does not work, so I chose to transfer 0L in step two.
@@ -1071,11 +1071,11 @@ MFRC522::StatusCode MFRC522::MIFARE_Restore(	byte blockAddr ///< The block (0-0x
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_TwoStepHelper(	byte command,	///< The command to use
+NFC::StatusCode NFC::MIFARE_TwoStepHelper(	byte command,	///< The command to use
 													byte blockAddr,	///< The block (0-0xff) number.
 													int32_t data		///< The data to transfer in step 2
 													) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	byte cmdBuffer[2]; // We only need room for 2 bytes.
 	
 	// Step 1: Tell the PICC the command and block address
@@ -1102,9 +1102,9 @@ MFRC522::StatusCode MFRC522::MIFARE_TwoStepHelper(	byte command,	///< The comman
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_Transfer(	byte blockAddr ///< The block (0-0xff) number.
+NFC::StatusCode NFC::MIFARE_Transfer(	byte blockAddr ///< The block (0-0xff) number.
 											) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	byte cmdBuffer[2]; // We only need room for 2 bytes.
 	
 	// Tell the PICC we want to transfer the result into block blockAddr.
@@ -1128,8 +1128,8 @@ MFRC522::StatusCode MFRC522::MIFARE_Transfer(	byte blockAddr ///< The block (0-0
  * @param[out]  value       Current value of the Value Block.
  * @return STATUS_OK on success, STATUS_??? otherwise.
   */
-MFRC522::StatusCode MFRC522::MIFARE_GetValue(byte blockAddr, int32_t *value) {
-	MFRC522::StatusCode status;
+NFC::StatusCode NFC::MIFARE_GetValue(byte blockAddr, int32_t *value) {
+	NFC::StatusCode status;
 	byte buffer[18];
 	byte size = sizeof(buffer);
 	
@@ -1153,7 +1153,7 @@ MFRC522::StatusCode MFRC522::MIFARE_GetValue(byte blockAddr, int32_t *value) {
  * @param[in]   value       New value of the Value Block.
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::MIFARE_SetValue(byte blockAddr, int32_t value) {
+NFC::StatusCode NFC::MIFARE_SetValue(byte blockAddr, int32_t value) {
 	byte buffer[18];
 	
 	// Translate the int32_t into 4 bytes; repeated 2x in value block
@@ -1183,12 +1183,12 @@ MFRC522::StatusCode MFRC522::MIFARE_SetValue(byte blockAddr, int32_t value) {
  * @param[in]   pACK       result success???.
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PCD_NTAG216_AUTH(byte* passWord, byte pACK[]) //Authenticate with 32bit password
+NFC::StatusCode NFC::PCD_NTAG216_AUTH(byte* passWord, byte pACK[]) //Authenticate with 32bit password
 {
 	// TODO: Fix cmdBuffer length and rxlength. They really should match.
 	//       (Better still, rxlength should not even be necessary.)
 
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	byte				cmdBuffer[18]; // We need room for 16 bytes data and 2 bytes CRC_A.
 	
 	cmdBuffer[0] = 0x1B; //Comando de autentificacion
@@ -1230,11 +1230,11 @@ MFRC522::StatusCode MFRC522::PCD_NTAG216_AUTH(byte* passWord, byte pACK[]) //Aut
  * 
  * @return STATUS_OK on success, STATUS_??? otherwise.
  */
-MFRC522::StatusCode MFRC522::PCD_MIFARE_Transceive(	byte *sendData,		///< Pointer to the data to transfer to the FIFO. Do NOT include the CRC_A.
+NFC::StatusCode NFC::PCD_MIFARE_Transceive(	byte *sendData,		///< Pointer to the data to transfer to the FIFO. Do NOT include the CRC_A.
 													byte sendLen,		///< Number of bytes in sendData.
 													bool acceptTimeout	///< True => A timeout is also success
 												) {
-	MFRC522::StatusCode result;
+	NFC::StatusCode result;
 	byte cmdBuffer[18]; // We need room for 16 bytes data and 2 bytes CRC_A.
 	
 	// Sanity check
@@ -1276,7 +1276,7 @@ MFRC522::StatusCode MFRC522::PCD_MIFARE_Transceive(	byte *sendData,		///< Pointe
  * 
  * @return const __FlashStringHelper *
  */
-const __FlashStringHelper *MFRC522::GetStatusCodeName(MFRC522::StatusCode code	///< One of the StatusCode enums.
+const __FlashStringHelper *NFC::GetStatusCodeName(NFC::StatusCode code	///< One of the StatusCode enums.
 										) {
 	switch (code) {
 		case STATUS_OK:				return F("Success.");
@@ -1297,7 +1297,7 @@ const __FlashStringHelper *MFRC522::GetStatusCodeName(MFRC522::StatusCode code	/
  * 
  * @return PICC_Type
  */
-MFRC522::PICC_Type MFRC522::PICC_GetType(byte sak		///< The SAK byte returned from PICC_Select().
+NFC::PICC_Type NFC::PICC_GetType(byte sak		///< The SAK byte returned from PICC_Select().
 										) {
 	// http://www.nxp.com/documents/application_note/AN10833.pdf 
 	// 3.2 Coding of Select Acknowledge (SAK)
@@ -1324,7 +1324,7 @@ MFRC522::PICC_Type MFRC522::PICC_GetType(byte sak		///< The SAK byte returned fr
  * 
  * @return const __FlashStringHelper *
  */
-const __FlashStringHelper *MFRC522::PICC_GetTypeName(PICC_Type piccType	///< One of the PICC_Type enums.
+const __FlashStringHelper *NFC::PICC_GetTypeName(PICC_Type piccType	///< One of the PICC_Type enums.
 													) {
 	switch (piccType) {
 		case PICC_TYPE_ISO_14443_4:		return F("PICC compliant with ISO/IEC 14443-4");
@@ -1346,8 +1346,8 @@ const __FlashStringHelper *MFRC522::PICC_GetTypeName(PICC_Type piccType	///< One
  * Dumps debug info about the connected PCD to Serial.
  * Shows all known firmware versions
  */
-void MFRC522::PCD_DumpVersionToSerial() {
-	// Get the MFRC522 firmware version
+void NFC::PCD_DumpVersionToSerial() {
+	// Get the NFC firmware version
 	byte v = PCD_ReadRegister(VersionReg);
 	Serial.print(F("Firmware Version: 0x"));
 	Serial.print(v, HEX);
@@ -1362,7 +1362,7 @@ void MFRC522::PCD_DumpVersionToSerial() {
 	}
 	// When 0x00 or 0xFF is returned, communication probably failed
 	if ((v == 0x00) || (v == 0xFF))
-		Serial.println(F("WARNING: Communication failure, is the MFRC522 properly connected?"));
+		Serial.println(F("WARNING: Communication failure, is the NFC properly connected?"));
 } // End PCD_DumpVersionToSerial()
 
 /**
@@ -1370,7 +1370,7 @@ void MFRC522::PCD_DumpVersionToSerial() {
  * On success the PICC is halted after dumping the data.
  * For MIFARE Classic the factory default key of 0xFFFFFFFFFFFF is tried.  
  */
-void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
+void NFC::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
 								) {
 	MIFARE_Key key;
 	
@@ -1415,7 +1415,7 @@ void MFRC522::PICC_DumpToSerial(Uid *uid	///< Pointer to Uid struct returned fro
 /**
  * Dumps card info (UID,SAK,Type) about the selected PICC to Serial.
  */
-void MFRC522::PICC_DumpDetailsToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
+void NFC::PICC_DumpDetailsToSerial(Uid *uid	///< Pointer to Uid struct returned from a successful PICC_Select().
 									) {
 	// UID
 	Serial.print(F("Card UID:"));
@@ -1444,7 +1444,7 @@ void MFRC522::PICC_DumpDetailsToSerial(Uid *uid	///< Pointer to Uid struct retur
  * Dumps memory contents of a MIFARE Classic PICC.
  * On success the PICC is halted after dumping the data.
  */
-void MFRC522::PICC_DumpMifareClassicToSerial(	Uid *uid,			///< Pointer to Uid struct returned from a successful PICC_Select().
+void NFC::PICC_DumpMifareClassicToSerial(	Uid *uid,			///< Pointer to Uid struct returned from a successful PICC_Select().
 												PICC_Type piccType,	///< One of the PICC_Type enums.
 												MIFARE_Key *key		///< Key A used for all sectors.
 											) {
@@ -1485,11 +1485,11 @@ void MFRC522::PICC_DumpMifareClassicToSerial(	Uid *uid,			///< Pointer to Uid st
  * Uses PCD_Authenticate(), MIFARE_Read() and PCD_StopCrypto1.
  * Always uses PICC_CMD_MF_AUTH_KEY_A because only Key A can always read the sector trailer access bits.
  */
-void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to Uid struct returned from a successful PICC_Select().
+void NFC::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to Uid struct returned from a successful PICC_Select().
 													MIFARE_Key *key,	///< Key A for the sector.
 													byte sector			///< The sector to dump, 0..39.
 													) {
-	MFRC522::StatusCode status;
+	NFC::StatusCode status;
 	byte firstBlock;		// Address of lowest address to dump actually last block dumped)
 	byte no_of_blocks;		// Number of blocks in sector
 	bool isSectorTrailer;	// Set to true while handling the "last" (ie highest address) in the sector.
@@ -1633,8 +1633,8 @@ void MFRC522::PICC_DumpMifareClassicSectorToSerial(Uid *uid,			///< Pointer to U
 /**
  * Dumps memory contents of a MIFARE Ultralight PICC.
  */
-void MFRC522::PICC_DumpMifareUltralightToSerial() {
-	MFRC522::StatusCode status;
+void NFC::PICC_DumpMifareUltralightToSerial() {
+	NFC::StatusCode status;
 	byte byteCount;
 	byte buffer[18];
 	byte i;
@@ -1675,7 +1675,7 @@ void MFRC522::PICC_DumpMifareUltralightToSerial() {
 /**
  * Calculates the bit pattern needed for the specified access bits. In the [C1 C2 C3] tuples C1 is MSB (=4) and C3 is LSB (=1).
  */
-void MFRC522::MIFARE_SetAccessBits(	byte *accessBitBuffer,	///< Pointer to byte 6, 7 and 8 in the sector trailer. Bytes [0..2] will be set.
+void NFC::MIFARE_SetAccessBits(	byte *accessBitBuffer,	///< Pointer to byte 6, 7 and 8 in the sector trailer. Bytes [0..2] will be set.
 									byte g0,				///< Access bits [C1 C2 C3] for block 0 (for sectors 0-31) or blocks 0-4 (for sectors 32-39)
 									byte g1,				///< Access bits C1 C2 C3] for block 1 (for sectors 0-31) or blocks 5-9 (for sectors 32-39)
 									byte g2,				///< Access bits C1 C2 C3] for block 2 (for sectors 0-31) or blocks 10-14 (for sectors 32-39)
@@ -1698,11 +1698,11 @@ void MFRC522::MIFARE_SetAccessBits(	byte *accessBitBuffer,	///< Pointer to byte 
  * Note that you do not need to have selected the card through REQA or WUPA,
  * this sequence works immediately when the card is in the reader vicinity.
  * This means you can use this method even on "bricked" cards that your reader does
- * not recognise anymore (see MFRC522::MIFARE_UnbrickUidSector).
+ * not recognise anymore (see NFC::MIFARE_UnbrickUidSector).
  * 
  * Of course with non-bricked devices, you're free to select them before calling this function.
  */
-bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
+bool NFC::MIFARE_OpenUidBackdoor(bool logErrors) {
 	// Magic sequence:
 	// > 50 00 57 CD (HALT + CRC)
 	// > 40 (7 bits only)
@@ -1718,7 +1718,7 @@ bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
 						  this will contain amount of valid response bits. */
 	byte response[32]; // Card's response is written here
 	byte received;
-	MFRC522::StatusCode status = PCD_TransceiveData(&cmd, (byte)1, response, &received, &validBits, (byte)0, false); // 40
+	NFC::StatusCode status = PCD_TransceiveData(&cmd, (byte)1, response, &received, &validBits, (byte)0, false); // 40
 	if(status != STATUS_OK) {
 		if(logErrors) {
 			Serial.println(F("Card did not respond to 0x40 after HALT command. Are you sure it is a UID changeable one?"));
@@ -1772,7 +1772,7 @@ bool MFRC522::MIFARE_OpenUidBackdoor(bool logErrors) {
  * It assumes a default KEY A of 0xFFFFFFFFFFFF.
  * Make sure to have selected the card before this function is called.
  */
-bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
+bool NFC::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	
 	// UID + BCC byte can not be larger than 16 together
 	if (!newUid || !uidSize || uidSize > 15) {
@@ -1784,7 +1784,7 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 	
 	// Authenticate for reading
 	MIFARE_Key key = {0xFF, 0xFF, 0xFF, 0xFF, 0xFF, 0xFF};
-	MFRC522::StatusCode status = PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, (byte)1, &key, &uid);
+	NFC::StatusCode status = PCD_Authenticate(NFC::PICC_CMD_MF_AUTH_KEY_A, (byte)1, &key, &uid);
 	if (status != STATUS_OK) {
 		
 		if (status == STATUS_TIMEOUT) {
@@ -1795,12 +1795,12 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 //			  byte atqa_size = 2;
 //			  PICC_WakeupA(atqa_answer, &atqa_size);
 			
-			if (!PICC_IsNewCardPresent() || !PICC_ReadCardSerial()) {
+			if (!cartaoEstaPresente() || !lerCodigoCartao()) {
 				Serial.println(F("No card was previously selected, and none are available. Failed to set UID."));
 				return false;
 			}
 			
-			status = PCD_Authenticate(MFRC522::PICC_CMD_MF_AUTH_KEY_A, (byte)1, &key, &uid);
+			status = PCD_Authenticate(NFC::PICC_CMD_MF_AUTH_KEY_A, (byte)1, &key, &uid);
 			if (status != STATUS_OK) {
 				// We tried, time to give up
 				if (logErrors) {
@@ -1874,13 +1874,13 @@ bool MFRC522::MIFARE_SetUid(byte *newUid, byte uidSize, bool logErrors) {
 /**
  * Resets entire sector 0 to zeroes, so the card can be read again by readers.
  */
-bool MFRC522::MIFARE_UnbrickUidSector(bool logErrors) {
+bool NFC::MIFARE_UnbrickUidSector(bool logErrors) {
 	MIFARE_OpenUidBackdoor(logErrors);
 	
 	byte block0_buffer[] = {0x01, 0x02, 0x03, 0x04, 0x04, 0x08, 0x04, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00};	
 	
 	// Write modified block 0 back to card
-	MFRC522::StatusCode status = MIFARE_Write((byte)0, block0_buffer, (byte)16);
+	NFC::StatusCode status = MIFARE_Write((byte)0, block0_buffer, (byte)16);
 	if (status != STATUS_OK) {
 		if (logErrors) {
 			Serial.print(F("MIFARE_Write() failed: "));
@@ -1901,7 +1901,7 @@ bool MFRC522::MIFARE_UnbrickUidSector(bool logErrors) {
  * 
  * @return bool
  */
-bool MFRC522::PICC_IsNewCardPresent() {
+bool NFC::cartaoEstaPresente() {
 	byte bufferATQA[2];
 	byte bufferSize = sizeof(bufferATQA);
 
@@ -1911,19 +1911,33 @@ bool MFRC522::PICC_IsNewCardPresent() {
 	// Reset ModWidthReg
 	PCD_WriteRegister(ModWidthReg, 0x26);
 
-	MFRC522::StatusCode result = PICC_RequestA(bufferATQA, &bufferSize);
+	NFC::StatusCode result = PICC_RequestA(bufferATQA, &bufferSize);
 	return (result == STATUS_OK || result == STATUS_COLLISION);
-} // End PICC_IsNewCardPresent()
+} // End cartaoEstaPresente()
 
 /**
  * Simple wrapper around PICC_Select.
  * Returns true if a UID could be read.
- * Remember to call PICC_IsNewCardPresent(), PICC_RequestA() or PICC_WakeupA() first.
+ * Remember to call cartaoEstaPresente(), PICC_RequestA() or PICC_WakeupA() first.
  * The read UID is available in the class variable uid.
  * 
  * @return bool
  */
-bool MFRC522::PICC_ReadCardSerial() {
-	MFRC522::StatusCode result = PICC_Select(&uid);
+bool NFC::lerCodigoCartao() {
+	NFC::StatusCode result = PICC_Select(&uid);
 	return (result == STATUS_OK);
+}
+
+void NFC::imprimirUID(NFC *nfc, String *conteudo){
+	Serial.print("UID da tag: ");
+	byte letra;
+	for (byte i = 0; i < (*nfc).uid.size; i++)  {
+     Serial.print((*nfc).uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print((*nfc).uid.uidByte[i], HEX);
+     (*conteudo).concat(String((*nfc).uid.uidByte[i] < 0x10 ? " 0" : " "));
+     (*conteudo).concat(String((*nfc).uid.uidByte[i], HEX));
+	}
+	Serial.println();
+	Serial.print("Mensagem: ");
+	(*conteudo).toUpperCase();
 } // End 

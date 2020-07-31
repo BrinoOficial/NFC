@@ -364,7 +364,8 @@ public:
 	// Convenience functions - does not add extra functionality
 	/////////////////////////////////////////////////////////////////////////////////////
 	virtual bool cartaoEstaPresente();
-	virtual bool LerCodigoCartao();
+	virtual bool lerCodigoCartao();
+	virtual void imprimirUID(NFC *nfc, String *conteudo);
 	
 protected:
 	byte _chipSelectPin;		// Arduino pin connected to NFC's SPI slave select input (Pin 24, NSS, active low)
