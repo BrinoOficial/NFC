@@ -21,13 +21,13 @@ class NFC{
 	NFC(byte pinoSelecaoChip, byte pinoReset);
     
 	void iniciar();
-	void iniciar(byte pinoReset);
-	void iniciar(byte pinoSelecaoChip, byte pinoReset);
+	//void iniciar(byte pinoReset);
+	//void iniciar(byte pinoSelecaoChip, byte pinoReset);
     	
-    virtual bool CartaoEstaPresente();
-	virtual bool LerCodigoCartao();
+    //virtual bool CartaoEstaPresente();
+	//virtual bool LerCodigoCartao();
 	
-	String imprimirUID();
+	virtual void imprimirUID(NFC *nfc, String *conteudo);
 	
   protected:
     byte _pinoSelecaoChip, _pinoReset;		

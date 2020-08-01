@@ -1,31 +1,25 @@
 /*
-* NFC.cpp - Biblioteca Arduino para modulo MFRC522 13.56 MHZ com TAGS SPI W e R.
-* NOTA: Por favor confira os comentarios em NFC.h - eles apresentam dicas importantes.
+* MFRC522.cpp - Library to use ARDUINO RFID MODULE KIT 13.56 MHZ WITH TAGS SPI W AND R BY COOQROBOT.
+* NOTE: Please also check the comments in MFRC522.h - they provide useful hints and background information.
+* Released into the public domain.
 */
 
 #include <Arduino.h>
 #include "NFC.h"
 
 /////////////////////////////////////////////////////////////////////////////////////
-// Funcoes para configurar o Arduino
+// Functions for setting up the Arduino
 /////////////////////////////////////////////////////////////////////////////////////
 /**
- * Construtor.
+ * Constructor.
  */
- 
-NFC:: NFC() : NFC(SS, UINT8_MAX){ // SS esta definido em pins_arduino.h, UINT8_MAX significa que nao ha conexao entre o Arduino com entrada RESET do MFRC522
-	MFRC522 MFRC522(SS, UINT8_MAX);
-} // fim do construtor
-
-/**
- * Construtor.
- * Prepara os pinos de saida.
- */
-NFC:: NFC(	byte pinoReset	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
-				): NFC(SS, pinoReset) { // SS is defined in pins_arduino.h
-	MFRC522 MFRC522
+MFRC522::MFRC522(): MFRC522(SS, UINT8_MAX) { // SS is defined in pins_arduino.h, UINT8_MAX means there is no connection from Arduino to MFRC522's reset and power down input
 } // End constructor
 
+/**
+ * Constructor.
+ * Prepares the output pins.
+ */
 MFRC522::MFRC522(	byte resetPowerDownPin	///< Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low). If there is no connection from the CPU to NRSTPD, set this to UINT8_MAX. In this case, only soft reset will be used in PCD_Init().
 				): MFRC522(SS, resetPowerDownPin) { // SS is defined in pins_arduino.h
 } // End constructor
