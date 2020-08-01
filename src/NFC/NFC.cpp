@@ -1926,4 +1926,17 @@ bool MFRC522::PICC_IsNewCardPresent() {
 bool MFRC522::PICC_ReadCardSerial() {
 	MFRC522::StatusCode result = PICC_Select(&uid);
 	return (result == STATUS_OK);
-} // End 
+} 
+void NFC::imprimirUID(NFC *nfc, String *conteudo){
+	Serial.print("UID da tag: ");
+	byte letra;
+	for (byte i = 0; i < (*nfc).uid.size; i++)  {
+     Serial.print((*nfc).uid.uidByte[i] < 0x10 ? " 0" : " ");
+     Serial.print((*nfc).uid.uidByte[i], HEX);
+     (*conteudo).concat(String((*nfc).uid.uidByte[i] < 0x10 ? " 0" : " "));
+     (*conteudo).concat(String((*nfc).uid.uidByte[i], HEX));
+	}
+	Serial.println();
+	Serial.print("Mensagem: ");
+	(*conteudo).toUpperCase();
+}// End 

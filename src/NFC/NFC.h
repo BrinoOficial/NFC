@@ -7,13 +7,19 @@
  * 
  * Please read this file for an overview and then MFRC522.cpp for comments on the specific functions.
  */
-#ifndef MFRC522_h
-#define MFRC522_h
+#ifndef NFC_h
+#define NFC_h
 
 #include "require_cpp11.h"
 #include "deprecated.h"
 // Enable integer limits
 #define __STDC_LIMIT_MACROS
+
+#define NFC MFRC522
+#define iniciar PCD_Init
+#define cartaoEstaPresente PICC_IsNewCardPresent
+#define lerCodigoCartao PICC_ReadCardSerial
+		
 #include <stdint.h>
 #include <Arduino.h>
 #include <SPI.h>
@@ -361,6 +367,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	virtual bool PICC_IsNewCardPresent();
 	virtual bool PICC_ReadCardSerial();
+	virtual void imprimirUID(NFC *nfc, String *conteudo);
 	
 protected:
 	byte _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
