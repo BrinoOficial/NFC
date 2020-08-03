@@ -1,4 +1,14 @@
 /*
+ * Biblioteca traduzida para módulo MFRC522
+ * autores: Rafael Mascarenhas Dal Moro e Gabriel Rodrigues Pacheco
+ * Para mais informacoes, leia o arquivo README
+ * Código construído a partir de outra biblioteca, dados a seguir 
+ ***********************************************************************
+ * Library to use Arduino MFRC522 module.
+ * 
+ * @authors Dr.Leong, Miguel Balboa, Søren Thing Andersen, Tom Clement, many more! See GitLog.
+ * 
+ */
 * MFRC522.cpp - Library to use ARDUINO RFID MODULE KIT 13.56 MHZ WITH TAGS SPI W AND R BY COOQROBOT.
 * NOTE: Please also check the comments in MFRC522.h - they provide useful hints and background information.
 * Released into the public domain.
@@ -1927,6 +1937,8 @@ bool MFRC522::PICC_ReadCardSerial() {
 	MFRC522::StatusCode result = PICC_Select(&uid);
 	return (result == STATUS_OK);
 } 
+
+// Imprime dados UID do cartao NFC
 void NFC::imprimirUID(NFC *nfc, String *conteudo){
 	Serial.print("UID da tag: ");
 	byte letra;

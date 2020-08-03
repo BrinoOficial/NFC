@@ -1,11 +1,13 @@
 /**
+ * Biblioteca traduzida para módulo MFRC522
+ * autores: Rafael Mascarenhas Dal Moro e Gabriel Rodrigues Pacheco
+ * Para mais informacoes, leia o arquivo README
+ * Código construído a partir de outra biblioteca, dados a seguir 
+ ***********************************************************************
  * Library to use Arduino MFRC522 module.
  * 
  * @authors Dr.Leong, Miguel Balboa, Søren Thing Andersen, Tom Clement, many more! See GitLog.
  * 
- * For more information read the README.
- * 
- * Please read this file for an overview and then MFRC522.cpp for comments on the specific functions.
  */
 #ifndef NFC_h
 #define NFC_h
@@ -15,6 +17,7 @@
 // Enable integer limits
 #define __STDC_LIMIT_MACROS
 
+// Comandos traduzidos
 #define NFC MFRC522
 #define iniciar PCD_Init
 #define cartaoEstaPresente PICC_IsNewCardPresent
@@ -367,8 +370,7 @@ public:
 	/////////////////////////////////////////////////////////////////////////////////////
 	virtual bool PICC_IsNewCardPresent();
 	virtual bool PICC_ReadCardSerial();
-	virtual void imprimirUID(NFC *nfc, String *conteudo);
-	
+	virtual void imprimirUID(NFC *nfc, String *conteudo); // Imprime dados UID do cartao NFC
 protected:
 	byte _chipSelectPin;		// Arduino pin connected to MFRC522's SPI slave select input (Pin 24, NSS, active low)
 	byte _resetPowerDownPin;	// Arduino pin connected to MFRC522's reset and power down input (Pin 6, NRSTPD, active low)
