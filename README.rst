@@ -1,3 +1,8 @@
+# Como instalar
+1. Baixe a pasta clicando no botão "Code" no canto superior esquerdo.
+2. Extraia os Arquivos
+3. Copie a pasta "NFC", localizada na pasta "src"
+4. Cole a pasta "NFC" dentro da pasta "libraries" (geralmente localizada em Documentos->Arduino)
 MFRC522
 =======
 
