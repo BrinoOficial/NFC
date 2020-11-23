@@ -1,4 +1,5 @@
-# Como instalar
+Como instalar
+=======
 1. Baixe a pasta clicando no botão "Code" no canto superior esquerdo.
 2. Extraia os Arquivos
 3. Copie a pasta "NFC", localizada na pasta "src"
