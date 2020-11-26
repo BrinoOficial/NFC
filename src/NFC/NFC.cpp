@@ -1950,6 +1950,5 @@ void NFC::imprimirUID(NFC *nfc, String *conteudo){
 	}
 	Serial.println();
 	(*conteudo).remove(0, 1);
-	Serial.print("Mensagem: ");
 	(*conteudo).toUpperCase();
 }// End 
